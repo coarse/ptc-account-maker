@@ -65,7 +65,7 @@ while(True):
 	br.form['password'] = PASSWORD
 	br.form['confirm_password'] = PASSWORD
 	br.form['email'] = EMAIL
-	br.form['confirm_email'] = ('.'*(count-1)) + EMAIL + '@google.com'
+	br.form['confirm_email'] = ('.'*(count-1)) + EMAIL + '@gmail.com'
 	br.form['public_profile_opt_in'] = ['False']
 	br.form['terms'] = ['on']
 	print 'success!'
