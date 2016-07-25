@@ -4,7 +4,7 @@ import time
 import sys
 import os
 import json
-from mechanize import Browser
+import mechanize
 
 def getEmails(email):
 	emails = []
@@ -24,21 +24,42 @@ if len(sys.argv) == 1:
 	sys.exit(1)
 
 limit = sys.argv[1]
+print 'trying to make ' + limit + 'accounts'
 count = 1
 emails = getEmails(EMAIL)
 
 while(True):
-	time.sleep(2)
-	br = Browser()
-	br.set_handle_robots( False )
+	br = mechanize.Browser()
+	br.set_handle_robots(False)
 	br.addheaders = [('User-agent', 'Firefox')]
 
-	br.open("https://club.pokemon.com/us/pokemon-trainer-club/sign-up/")
+	if (count > 1):
+		print 'sleeping for 2 seconds...'
+		time.sleep(2)
+
+	print 'trying to open verification form...'
+	try:
+		br.open("https://club.pokemon.com/us/pokemon-trainer-club/sign-up/")
+	except mechanize.HTTPError, e:
+		print 'error occured! restarting attempt...'
+		print e
+		continue
+	print 'success!'
+
+	print 'filling up form...'
 	br.select_form(name='verify-age')
 	br.form['dob'] = DOB
+	print 'success!'
 	res = br.submit()
 	print 'done submitting age verification!'
 
+	if (br.geturl() != "https://club.pokemon.com/us/pokemon-trainer-club/parents/sign-up"):
+		print 'something went wrong! shutting down lol'
+		sys.exit(1)
+	else:
+		print 'success! moving to the next form...'
+
+	print 'filling up form...'
 	br.select_form(name='create-account')
 	br.form['username'] = USERNAME + str(count)
 	br.form['password'] = PASSWORD
@@ -47,13 +68,9 @@ while(True):
 	br.form['confirm_email'] = ('.'*(count-1)) + EMAIL + '@google.com'
 	br.form['public_profile_opt_in'] = ['False']
 	br.form['terms'] = ['on']
-	res = br.submit() # submit
-	print 'done submitting !'
-	# time.sleep(5) # idk if this is needed
-	content = res.read()
-
-	with open("results.html", "a") as f:
-	    f.write(content)
+	print 'success!'
+	res = br.submit()
+	print 'done submitting registration form!'
 
 	if (br.geturl() != "https://club.pokemon.com/us/pokemon-trainer-club/parents/email"):
 		print 'failed! continuing with next account'
