@@ -61,4 +61,5 @@ while(True):
 		print 'success! created account' + USERNAME + str(count) + ":" + PASSWORD
 		count = count + 1
 
-	if (count-1 > limit)
+	if (count > limit):
+		break
